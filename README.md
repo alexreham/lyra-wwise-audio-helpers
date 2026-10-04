@@ -61,8 +61,8 @@ The component relies on Lyra's gameplay messages (`Lyra.Damage.Message`, `Lyra.E
 
 ## Lyra gotchas these helpers handle
 
-- **Bots look like players.** `ALyraPlayerBotController` inherits from `APlayerController`, so `IsLocallyControlled()` and casts to PlayerController can return true for bots. The reliable check is `PlayerController->GetLocalPlayer() != nullptr`.
-- **The listener is ~3 m from your character.** It sits on the PlayerCameraManager. Self-sounds posted on the character pan off-center and attenuate wrongly.
+- **`IsLocallyControlled()` is true for bots too.** Lyra's bots use `ALyraPlayerBotController`, an AI controller, and in standalone or on a listen server AI controllers count as local. To find the human player, cast the controller to `APlayerController` (bots fail this) and check `GetLocalPlayer() != nullptr` (remote players on a listen server fail this).
+- **The listener is a few meters from your character.** It sits on the PlayerCameraManager, behind and to the side of the pawn. Self-sounds posted on the character pan off-center and attenuate wrongly.
 - **Switches are per game object.** Set a switch on the same object you post the event on. If the event goes to the camera, the switch must go there too.
 - **`PostEventAtLocation` creates an anonymous emitter**, so per-object switches don't apply to it.
 - **A new pawn is created on every respawn.** Anything that must survive death (kill count, which combat state is next) has to live outside the pawn — the component keeps it in static variables.

@@ -181,9 +181,9 @@ bool ULyraCombatIntensityComponent::TryRegisterListeners()
 	}
 
 	// Must be controlled by a real human player's controller with a ULocalPlayer.
-	// Lyra's ALyraPlayerBotController extends APlayerController, so a plain
-	// Cast<APlayerController> is not enough to filter bots. Bot controllers
-	// never have a ULocalPlayer assigned — only the real human player does.
+	// Lyra's bots use ALyraPlayerBotController (an AI controller), so they fail the
+	// Cast<APlayerController>. Remote players on a listen server pass the cast but have
+	// no ULocalPlayer. Only the human player on this machine passes both checks.
 	APlayerController* PC = Cast<APlayerController>(OwnerPawn->GetController());
 	if (!PC)
 	{
@@ -198,7 +198,7 @@ bool ULyraCombatIntensityComponent::TryRegisterListeners()
 
 	if (!PC->GetLocalPlayer())
 	{
-		// PlayerController without a LocalPlayer = LyraPlayerBotController or remote PC.
+		// PlayerController without a LocalPlayer = a remote player on a listen server.
 		SetComponentTickEnabled(false);
 		return false;
 	}

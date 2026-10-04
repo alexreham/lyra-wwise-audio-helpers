@@ -23,13 +23,15 @@ int32 UWwiseAudioHelper::PostEventSmart(UAkAudioEvent* Event, AActor* Actor, UOb
 	AActor* PostTarget = Actor;
 
 	// Redirect local player pawn → PlayerCameraManager so the Wwise emitter is
-	// co-located with the default listener. This eliminates the ~3 m capsule-to-camera
-	// offset that causes orientation-dependent volume drops and off-center panning
-	// on self-produced sounds.
+	// co-located with the default listener. This removes the capsule-to-camera offset
+	// (a few meters in Lyra's third-person camera) that causes orientation-dependent
+	// volume drops and off-center panning on self-produced sounds.
 	//
-	// Bot check: ALyraPlayerBotController extends APlayerController, so a plain
-	// Cast<APlayerController> is NOT sufficient. Only real human controllers have a
-	// ULocalPlayer assigned, so GetLocalPlayer() != nullptr is the reliable test.
+	// Local player check: IsLocallyControlled() is not enough, because Lyra's bots
+	// (ALyraPlayerBotController, an AI controller) also count as "local" in standalone
+	// and on a listen server. Bots fail the Cast<APlayerController>, and remote players
+	// on a listen server have no ULocalPlayer, so Cast + GetLocalPlayer() != nullptr
+	// matches only the human player on this machine.
 	if (const APawn* Pawn = Cast<APawn>(Actor))
 	{
 		if (const APlayerController* PC = Cast<APlayerController>(Pawn->GetController()))
@@ -71,8 +73,8 @@ int32 UWwiseAudioHelper::PostEventAtSocketWithLocalPlayerOffset(
 	// Determine whether this is the local human player.
 	// OwnerActor is the mesh's owner — for weapons that's the weapon actor (e.g. B_Pistol_C),
 	// not the pawn. Walk up the owner chain to find the pawn that actually drives the controller.
-	// Bot check: ALyraPlayerBotController extends APlayerController, so only checking
-	// GetLocalPlayer() != nullptr correctly filters bots (same guard as PostEventSmart).
+	// Same local player check as PostEventSmart: Cast<APlayerController> filters out
+	// bots (they use an AI controller), GetLocalPlayer() != nullptr filters out remote players.
 	AActor* PawnActor = OwnerActor;
 	while (PawnActor && !Cast<APawn>(PawnActor))
 	{
