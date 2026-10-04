@@ -10,13 +10,15 @@ Written by [Alex Reham](https://alexreham.com) while building a complete interac
 
 | File | What it does |
 | --- | --- |
-| `Source/Audio/WwiseAudioHelper.h/.cpp` | Blueprint function library with two nodes (below) |
+| `Source/Audio/WwiseAudioHelper.h/.cpp` | Blueprint function library with two nodes: **Post Event Smart** and **Post Event At Socket With Local Player Offset** (both described below) |
 | `Source/Audio/AnimNotify_WwiseEvent.h/.cpp` | A **Wwise Event** AnimNotify for reloads, dry fire, equip and other animation sounds. Optional socket position and surface switch |
 | `Source/Audio/LyraCombatIntensityComponent.h/.cpp` | Drives an adaptive music system: a smoothed `Combat_Intensity` RTPC, the `MusicState` (Idle / Combat1 / Combat2 / EndGame), plus damage, death, kill, respawn and hit SFX for the local player |
 
-**Post Event Smart**: posts an event on the PlayerCameraManager for the local player (where the Wwise listener lives) and on the actor itself for bots and everything else. Your own sounds stay centered, bots stay fully spatialized in 3D.
+After a rebuild, both nodes appear in the Blueprint editor under the **Wwise** category.
 
-**Post Event At Socket With Local Player Offset**: spawns a temporary AkComponent on a skeletal mesh socket, sets an optional switch on it, posts the event, and destroys itself when the sound ends. Unlike `PostEventAtLocation`, per-object switches work. Used for surface-aware shell drops.
+**Post Event Smart** (`UWwiseAudioHelper::PostEventSmart`): posts an event on the PlayerCameraManager for the local player (where the Wwise listener lives) and on the actor itself for bots and everything else. Your own sounds stay centered, bots stay fully spatialized in 3D.
+
+**Post Event At Socket With Local Player Offset** (`UWwiseAudioHelper::PostEventAtSocketWithLocalPlayerOffset`): spawns a temporary AkComponent on a skeletal mesh socket, sets an optional switch on it, posts the event, and destroys itself when the sound ends. Unlike `PostEventAtLocation`, per-object switches work. Used for surface-aware shell drops.
 
 ## Setup
 
